@@ -18,6 +18,7 @@ const mountainB = new MountainBackground(100, 330);
 //State variable
 state = "start";
 let score = 0;
+let lives = 3;
 
 //Control for character variable
 let controlMode = "arrow";
@@ -36,7 +37,10 @@ function createSnowball() {
     //Size of the snowballs
     size: 150,
     //Random speeds for the snowballs
-    speed: 4,
+    speed: 7,
+
+    //Random type of snowball
+    type: random() < 0.5 ? "score" : "monster",
   };
   snowballs.push(snowball);
 }
@@ -46,16 +50,53 @@ function updateSnowballs() {
     let snowball = snowballs[i];
     snowball.y += snowball.speed;
 
+    //Draw the snowballs
     push();
     stroke(0, 0, 0);
     fill(255, 255, 255);
     ellipse(snowball.x, snowball.y, snowball.size);
     pop();
 
+    //Check for collision with charcater
+    let distance = dist(snowball.x, snowball.y, characterX, height - 100);
+
+    if (distance < snowball.size / 2 + 50) {
+      //If the snowball is "good" increase score
+      if (snowball.type === "score") {
+        score++;
+      } else if (snowball.type === "monster") {
+        lives--;
+
+        //If all there's no lives left, the game is over
+        if (lives <= 0) {
+          state = "result";
+        }
+      }
+      //Remove snowball after collision
+      snowballs.splice(i, 1);
+      continue;
+    }
+
+    //Remove the snowballs when they come to the end of the canvas
     if (snowball.y > height + snowball.size / 2) {
       snowballs.splice(i, 1);
     }
   }
+}
+
+//Function for when the game is reseted
+function resetGame() {
+  //Resets the score to 0
+  score = 0;
+
+  //Resets the lives to 3
+  lives = 3;
+
+  //Resets the snowballs
+  snowballs = [];
+
+  //Goes back to the game screen
+  state = "game";
 }
 
 //Function for when the mouse is pressed
@@ -116,7 +157,7 @@ function mousePressed() {
       state = "start";
     }
     if (mouseX > 320 && mouseX < 620 && mouseY > 750 && mouseY < 830) {
-      state = "game";
+      resetGame();
     }
   }
 }
@@ -193,12 +234,12 @@ function gameScreen() {
   text("Score:" + score, width / 2 - 420, height / 2 - 410);
   pop();
 
-  //Lives text
+  //Lives displayed on screen
   push();
   fill(255, 50, 50);
-  ellipse(width / 2 + 410, height / 2 - 415, 30);
-  ellipse(width / 2 + 370, height / 2 - 415, 30);
-  ellipse(width / 2 + 330, height / 2 - 415, 30);
+  for (let i = 0; i < lives; i++) {
+    ellipse(width / 2 + 410 - i * 40, height / 2 - 415, 30);
+  }
   pop();
   //Character movement
   if (controlMode === "arrow") {
@@ -224,7 +265,7 @@ function gameScreen() {
 
   updateSnowballs();
 
-  if (frameCount % 70 === 0) {
+  if (frameCount % 30 === 0) {
     createSnowball();
   }
 
@@ -242,12 +283,18 @@ function resultScreen() {
   rect(width / 2 - 130, height / 2 + 150, 300, 80, 30);
   rect(width / 2 - 130, height / 2 + 300, 300, 80, 30);
 
-  //Game over text
   push();
-  fill(0, 0, 0);
+  //Game over text
+  fill(255, 50, 50);
   textSize(70);
   textStyle(BOLD);
   text("GAME OVER", width / 2 - 200, height / 2 - 20);
+
+  //Score text
+  fill(0, 0, 0);
+  textSize(50);
+  textStyle(BOLD);
+  text("SCORE: " + score, width / 2 - 100, height / 2 + 100);
 
   //Text in buttons
   textSize(30);
@@ -258,7 +305,7 @@ function resultScreen() {
 
 //Draw function using states
 function draw() {
-  /*if (state === "start") {
+  if (state === "start") {
     startScreen();
   } else if (state === "options") {
     optionScreen();
@@ -266,8 +313,6 @@ function draw() {
     gameScreen();
   } else if (state === "result") {
     resultScreen();
-  }*/
-
-  gameScreen();
+  }
 }
 window.draw = draw;
