@@ -40,7 +40,7 @@ function createSnowball() {
     speed: 7,
 
     //Random type of snowball
-    type: random() < 0.5 ? "score" : "monster",
+    type: random() < 0.4 ? "score" : random() < 0.7 ? "monster" : "life",
   };
   snowballs.push(snowball);
 }
@@ -52,9 +52,18 @@ function updateSnowballs() {
 
     //Draw the snowballs
     push();
+    if (snowball.type === "monster") {
+      fill(255, 0, 0);
+    } else if (snowball.type === "life") {
+      fill(0, 255, 0);
+    } else {
+      fill(255, 255, 255);
+    }
     stroke(0, 0, 0);
-    fill(255, 255, 255);
     ellipse(snowball.x, snowball.y, snowball.size);
+    /*stroke(0, 0, 0);
+    fill(255, 255, 255);
+    ellipse(snowball.x, snowball.y, snowball.size);*/
     pop();
 
     //Check for collision with charcater
@@ -71,6 +80,9 @@ function updateSnowballs() {
         if (lives <= 0) {
           state = "result";
         }
+      } else if (snowball.type === "life") {
+        //Gain one life, you can get max 5 lifes
+        lives = min(lives + 1, 5);
       }
       //Remove snowball after collision
       snowballs.splice(i, 1);
@@ -265,7 +277,7 @@ function gameScreen() {
 
   updateSnowballs();
 
-  if (frameCount % 30 === 0) {
+  if (frameCount % 20 === 0) {
     createSnowball();
   }
 
