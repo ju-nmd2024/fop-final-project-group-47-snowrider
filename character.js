@@ -1,13 +1,17 @@
+let x = 450;
+let y = 450;
+push();
+translate(x, y);
 //The character
 strokeWeight(1);
 background(255, 255, 255);
 
 //The hat
 fill(255, 255, 255);
-triangle(435, 440, 450, 415, 465, 440);
+triangle(x - 15, y - 10, x, y - 35, x + 15, y - 10);
 fill(255, 0, 0);
-ellipse(450, 450, 35);
-ellipse(450, 418, 10);
+ellipse(x, y, 35);
+ellipse(x, y - 32, 10);
 fill(0, 0, 0);
 ellipse(438, 446, 5);
 ellipse(445, 441, 5);
@@ -28,24 +32,24 @@ ellipse(450, 499, 3);
 
 //Hands
 fill(0, 0, 0);
-ellipse(434, 507, 10, 12);
-ellipse(467, 507, 10, 12);
+ellipse(x - 16, y + 57, 10, 12);
+ellipse(x + 17, y + 57, 10, 12);
 fill(255, 200, 150);
 rect(429, 487, 10, 17, 1);
 rect(462, 487, 10, 17, 1);
 
 //The Face
 fill(255, 200, 150);
-ellipse(433, 460, 5, 10);
-ellipse(467, 460, 5, 10);
-ellipse(450, 460, 33);
+ellipse(x - 17, y + 10, 5, 10);
+ellipse(x + 17, y + 10, 5, 10);
+ellipse(x, y + 10, 33);
 fill(0, 0, 0);
 arc(450, 465, 8, 5, 0, 3.14);
 
 //The Eyes
 fill(255, 255, 255);
-ellipse(445, 458, 5, 2);
-ellipse(455, 458, 5, 2);
+ellipse(x - 5, y + 8, 5, 2);
+ellipse(x + 5, y + 8, 5, 2);
 fill(0, 0, 0);
 ellipse(445, 458, 1);
 ellipse(455, 458, 1);
@@ -64,5 +68,6 @@ line(456, 505, 465, 515);
 
 //The skate
 fill(255, 255, 255);
-rect(439, 547, 10, 27, 3);
-rect(453, 547, 10, 27, 3);
+rect(x - 11, y + 97, 10, 27, 3);
+rect(x + 3, y + 97, 10, 27, 3);
+pop();
