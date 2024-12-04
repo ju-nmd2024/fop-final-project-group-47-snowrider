@@ -1,7 +1,7 @@
 let x = 450;
 let y = 450;
 push();
-translate(x, y);
+translate(100, 100);
 //The character
 strokeWeight(1);
 background(255, 255, 255);

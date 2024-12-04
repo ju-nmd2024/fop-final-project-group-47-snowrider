@@ -27,6 +27,11 @@ let snowballs = [];
 
 //Character variable
 let characterX = 450;
+let characterY = height - 150;
+let speedY = 0;
+const gravity = 0.8;
+const jumpStrength = -15;
+let isJumping = false;
 
 function createSnowball() {
   let snowball = {
@@ -175,12 +180,33 @@ function mousePressed() {
 }
 window.mousePressed = mousePressed;
 
+function keyPressed() {
+  if (keyCode === 32 && !isJumping) {
+    speedY = jumpStrength;
+    isJumping = true;
+  }
+}
+window.keyPressed = keyPressed;
+
 function character() {
   push();
   stroke(0, 0, 0);
   fill(255, 255, 255);
-  rect(characterX - 50, height - 150, 100, 100);
+  rect(characterX - 50, characterY, 100, 100);
   pop();
+}
+
+function characterJump() {
+  if (characterY < height - 150 || speedY !== 0) {
+    speedY += gravity;
+    characterY += speedY;
+
+    if (characterY > height - 150) {
+      characterY = height - 150;
+      speedY = 0;
+      isJumping = false;
+    }
+  }
 }
 
 //Function for the start screen, with buttons
@@ -274,6 +300,8 @@ function gameScreen() {
 
   //Constrains the character from moving outside the canvas
   characterX = constrain(characterX, 50, width - 50);
+
+  characterJump();
 
   updateSnowballs();
 
