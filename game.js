@@ -190,10 +190,90 @@ function keyPressed() {
 window.keyPressed = keyPressed;
 
 function character() {
+  // Hat
+  fill(100, 100, 100);
+  triangle(
+    characterX - 17,
+    characterY - 65,
+    characterX,
+    characterY - 90,
+    characterX + 17,
+    characterY - 65
+  );
+
+  fill(255, 50, 50);
+  ellipse(characterX, characterY - 60, 36, 20);
+  ellipse(characterX, characterY - 66, 35, 10);
+  ellipse(characterX, characterY - 90, 10);
+
+  // Jacket
+  fill(90, 90, 90);
+  rect(characterX - 13, characterY - 35, 30, 40, 10);
+  rect(characterX + 12, characterY - 35, 10, 30, 5);
+  rect(characterX - 18, characterY - 35, 10, 30, 5);
+
   push();
   stroke(0, 0, 0);
-  fill(255, 255, 255);
-  rect(characterX - 50, characterY, 100, 100);
+  line(characterX - 10, characterY - 33, characterX, characterY - 27);
+  line(characterX + 10, characterY - 33, characterX, characterY - 27);
+  line(characterX, characterY - 33, characterX, characterY);
+  pop();
+
+  // Jacket buttons
+  fill(0, 0, 0);
+  ellipse(characterX, characterY - 27, 5);
+  ellipse(characterX, characterY - 16, 5);
+  ellipse(characterX, characterY - 4, 5);
+
+  // Hands
+  fill(0, 0, 0);
+  ellipse(characterX - 16, characterY - 3, 10, 12);
+  ellipse(characterX + 18, characterY - 3, 10, 12);
+
+  // Face
+  fill(255, 200, 150);
+  ellipse(characterX - 17, characterY - 50, 5, 10);
+  ellipse(characterX + 17, characterY - 50, 5, 10);
+  ellipse(characterX, characterY - 50, 33);
+
+  // Mouth
+  fill(0, 0, 0);
+  arc(characterX, characterY - 45, 8, 5, 0, PI);
+  push();
+
+  // Red part of hat, front
+  stroke(255, 50, 50);
+  strokeWeight(9);
+  line(characterX - 13, characterY - 63, characterX + 13, characterY - 63);
+  pop();
+
+  // Black dots on hat
+  fill(0, 0, 0);
+  ellipse(characterX - 13, characterY - 63, 5);
+  ellipse(characterX - 5, characterY - 65, 5);
+  ellipse(characterX + 3, characterY - 65, 5);
+  ellipse(characterX + 11, characterY - 63, 5);
+
+  // Eyes
+  fill(0, 0, 0);
+  ellipse(characterX - 7, characterY - 52, 3);
+  ellipse(characterX + 7, characterY - 52, 3);
+
+  // Shoes
+  fill(0, 0, 0);
+  ellipse(characterX - 6, characterY + 35, 15, 20);
+  ellipse(characterX + 9, characterY + 35, 15, 20);
+
+  // Jeans
+  fill(255, 50, 50);
+  rect(characterX - 14, characterY, 15, 33, 5);
+  rect(characterX + 1, characterY, 15, 33, 5);
+
+  // Skates
+  fill(90, 90, 90);
+  rect(characterX - 11, characterY + 40, 10, 27, 3);
+  rect(characterX + 4, characterY + 40, 10, 27, 3);
+
   pop();
 }
 
