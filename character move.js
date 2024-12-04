@@ -73,10 +73,9 @@ function Character(x, y, character) {
 // game logic variable
 let x = 250;
 let y = 10;
-let gravity = 0.1;
-let acceleration = 0.1;
+let gravity = 0.2;
+let acceleration = 0.01;
 let initialGravity = 0.1;
-let landingPadSpeed = 1;
 
 // game state variables
 let gameState = true;
@@ -88,11 +87,22 @@ function draw() {
   // Draw character on top of clouds
   Character(x, y, mouseIsPressed);
 
-  y = x + gravity;
+  y = y + gravity;
   gravity = gravity + acceleration;
 
   // decrease the velocity when clicking
   if (mouseIsPressed || keyIsDown(32)) {
     gravity = gravity - 0.5;
+  }
+  if (keyIsDown(37)) {
+    x -= 15;
+  }
+  if (keyIsDown(39)) {
+    x += 15;
+  }
+  if (keyIsDown(38)) {
+    y -= 15;
+  } else if (keyIsDown(40)) {
+    y += 15;
   }
 }
