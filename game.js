@@ -162,6 +162,7 @@ function mousePressed() {
   if (state === "start") {
     if (mouseX > 200 && mouseX < 400 && mouseY > 650 && mouseY < 730) {
       state = "game";
+      resetGame();
     }
     if (mouseX > 500 && mouseX < 700 && mouseY > 650 && mouseY < 730) {
       state = "options";
@@ -305,7 +306,7 @@ function gameScreen() {
 
   updateSnowballs();
 
-  if (frameCount % 20 === 0) {
+  if (frameCount % 35 === 0) {
     createSnowball();
   }
 
