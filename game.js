@@ -1,6 +1,7 @@
 let gameStart;
 let endGame;
 let option;
+let gameBgd;
 
 //Class imports
 import MountainBackground from "./mountainBackground.js";
@@ -20,6 +21,7 @@ function preload() {
   gameStart = loadImage("Snow-Rider Start Screen.jpg");
   endGame = loadImage("Snow-Rider End Screen.jpg");
   option = loadImage("Snow-Rider Option Screen.jpg");
+  gameBgd = loadImage("Snow-Rider Game  Screen.jpg");
 }
 
 //Class variables
@@ -389,8 +391,7 @@ function optionScreen() {
 
 //Function for the game screen
 function gameScreen() {
-  background(133, 206, 244);
-  mountainB.draw();
+  image(gameBgd, 0, 0, width, height);
 
   //Score text
   push();
