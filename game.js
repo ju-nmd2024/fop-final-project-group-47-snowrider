@@ -24,12 +24,13 @@ let lives = 3;
 let controlMode = "arrow";
 
 let snowballs = [];
+let obstacles = [];
 
 //Character variable
 let characterX = 450;
 let characterY = height - 150;
 let speedY = 0;
-const gravity = 0.8;
+const gravity = 0.6;
 const jumpStrength = -15;
 let isJumping = false;
 
@@ -45,9 +46,20 @@ function createSnowball() {
     speed: 7,
 
     //Random type of snowball
-    type: random() < 0.4 ? "score" : random() < 0.7 ? "monster" : "life",
+    type: random() < 0.9 ? "score" : "life",
   };
   snowballs.push(snowball);
+}
+
+function createObstacles() {
+  let obstacle = {
+    x: random(100, width - 100),
+    y: 370,
+    width: 150,
+    height: 70,
+    speed: 5,
+  };
+  obstacles.push(obstacle);
 }
 
 function updateSnowballs() {
@@ -57,18 +69,15 @@ function updateSnowballs() {
 
     //Draw the snowballs
     push();
-    if (snowball.type === "monster") {
-      fill(255, 0, 0);
-    } else if (snowball.type === "life") {
-      fill(0, 255, 0);
+    if (snowball.type === "life") {
+      fill(255, 50, 50); // Red color for the heart
+      noStroke();
+      drawHeart(snowball.x, snowball.y, snowball.size / 2); // Use a custom heart shape
     } else {
       fill(255, 255, 255);
+      stroke(0, 0, 0);
+      ellipse(snowball.x, snowball.y, snowball.size);
     }
-    stroke(0, 0, 0);
-    ellipse(snowball.x, snowball.y, snowball.size);
-    /*stroke(0, 0, 0);
-    fill(255, 255, 255);
-    ellipse(snowball.x, snowball.y, snowball.size);*/
     pop();
 
     //Check for collision with charcater
@@ -78,13 +87,6 @@ function updateSnowballs() {
       //If the snowball is "good" increase score
       if (snowball.type === "score") {
         score++;
-      } else if (snowball.type === "monster") {
-        lives--;
-
-        //If all there's no lives left, the game is over
-        if (lives <= 0) {
-          state = "result";
-        }
       } else if (snowball.type === "life") {
         //Gain one life, you can get max 5 lifes
         lives = min(lives + 1, 5);
@@ -97,6 +99,35 @@ function updateSnowballs() {
     //Remove the snowballs when they come to the end of the canvas
     if (snowball.y > height + snowball.size / 2) {
       snowballs.splice(i, 1);
+    }
+  }
+}
+
+function updateObstacles() {
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    let obstacle = obstacles[i];
+    obstacle.y += obstacle.speed;
+
+    fill(139, 69, 19);
+    rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 10);
+
+    if (
+      characterX + 50 > obstacle.x &&
+      characterX - 50 < obstacle.x + obstacle.width
+    ) {
+      if (characterY + 50 >= obstacle.y) {
+        lives--;
+
+        if (lives <= 0) {
+          state = "result";
+        }
+        obstacles.splice(i, 1);
+        continue;
+      }
+    }
+
+    if (obstacle.y > height) {
+      obstacles.splice(i, 1);
     }
   }
 }
@@ -189,6 +220,15 @@ function keyPressed() {
 }
 window.keyPressed = keyPressed;
 
+// Function to draw a heart
+function drawHeart(x, y, size) {
+  beginShape();
+  vertex(x, y);
+  bezierVertex(x - size, y - size, x - size * 1.5, y + size / 2, x, y + size);
+  bezierVertex(x + size * 1.5, y + size / 2, x + size, y - size, x, y);
+  endShape();
+}
+
 function character() {
   // Hat
   fill(100, 100, 100);
@@ -278,6 +318,13 @@ function character() {
 }
 
 function characterJump() {
+  /*speedY += gravity;
+  characterY += speedY;
+
+  if(characterY >= height - 10) {
+    characterY = height - 100;
+    isJumping = false;
+  }*/
   if (characterY < height - 150 || speedY !== 0) {
     speedY += gravity;
     characterY += speedY;
@@ -389,6 +436,12 @@ function gameScreen() {
   if (frameCount % 35 === 0) {
     createSnowball();
   }
+
+  if (frameCount % 120 === 0) {
+    createObstacles();
+  }
+
+  updateObstacles();
 
   character();
   //character.draw();
