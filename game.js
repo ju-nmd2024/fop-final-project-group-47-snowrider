@@ -63,7 +63,7 @@ function createSnowball() {
 
 function createLogs() {
   let log = {
-    x: 0,
+    x: -150,
     y: 770,
     width: random(100, 250),
     height: 40,
