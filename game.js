@@ -1,9 +1,89 @@
-let gameStart;
-let endGame;
-let option;
-
 //Class imports
 import MountainBackground from "./mountainBackground.js";
+
+//Character variable
+let characterY;
+
+//Class for snowball
+class SnowBall {
+  constructor(x, y, size, speed, type) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.speed = speed;
+    this.type = type;
+  }
+
+  //Drawing the snowballs and the heart
+  draw() {
+    push();
+    if (this.type == "life") {
+      fill(155, 50, 50);
+      noStroke();
+      drawHeart(this.x, this.y, this.size / 2);
+    } else {
+      fill(255, 255, 255);
+      stroke(0, 0, 0);
+      ellipse(this.x, this.y, this.size);
+    }
+    pop();
+  }
+
+  //The movement of the heart and snowball
+  update() {
+    this.y += this.speed;
+  }
+
+  //When the snowball and heart is out of canvas it disappears
+  offCanvas() {
+    return this.y > height + this.size / 2;
+  }
+
+  //Collision with the character
+  collide(characterX, characterY) {
+    //Counting the distance from the character
+    let distance = dist(this.x, this.y, characterX, characterY);
+
+    return distance < this.size / 2 + 50;
+  }
+}
+
+//Class for the logs
+class Logs {
+  constructor(x, y, width, height, speed) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.speed = speed;
+  }
+
+  //Drawing the logs
+  draw() {
+    fill(139, 69, 19);
+    rect(this.x, this.y, this.width, this.height, 10);
+  }
+
+  //Movement of the logs
+  update() {
+    this.x += this.speed;
+  }
+
+  //When logs are off the canvas, they disappear
+  offCanvas() {
+    return this.x > width;
+  }
+
+  //Logs collision with the character
+  collide(characterX, characterY) {
+    return (
+      characterX + 50 > this.x &&
+      characterX - 50 < this.x + this.width &&
+      characterY + 50 > this.y &&
+      characterY - 50 < this.y + this.height
+    );
+  }
+}
 
 //Setup function with canvas size
 function setup() {
@@ -13,130 +93,113 @@ function setup() {
 
   width = 900;
   height = 900;
+  characterY = height - 150;
 }
 window.setup = setup;
-
-function preload() {
-  gameStart = loadImage("Snow-Rider Start Screen.jpg");
-  endGame = loadImage("Snow-Rider End Screen.jpg");
-  option = loadImage("Snow-Rider Option Screen.jpg");
-}
 
 //Class variables
 const mountainB = new MountainBackground(100, 330);
 
+let gameStart;
+let endGame;
+let option;
+
 //State variable
-state = "start";
+let state = "start";
 let score = 0;
 let lives = 3;
 
 //Control for character variable
 let controlMode = "arrow";
 
+//Array variables for snowballs and logs
 let snowballs = [];
 let logs = [];
 
 //Character variable
 let characterX = 450;
-let characterY = height - 150;
 let speedY = 0;
 const gravity = 0.6;
 const jumpStrength = -15;
 let isJumping = false;
 
-function createSnowball() {
-  let snowball = {
-    //Random x positioning
-    x: random(50, width - 50),
-    //Y position for the spawning
-    y: 370,
-    //Size of the snowballs
-    size: 150,
-    //Random speeds for the snowballs
-    speed: 7,
+function preload() {
+  gameStart = loadImage("Snow-Rider Start Screen.jpg");
+  endGame = loadImage("Snow-Rider End Screen.jpg");
+  option = loadImage("Snow-Rider Option Screen.jpg");
+}
+window.preload = preload;
 
-    //Random type of snowball
-    type: random() < 0.9 ? "score" : "life",
-  };
+function createSnowball() {
+  let snowball = new SnowBall(
+    random(50, width - 50),
+    370,
+    random(100, 200),
+    4,
+    random() < 0.9 ? "score" : "type"
+  );
+
   snowballs.push(snowball);
 }
 
+//Function for the log variables
 function createLogs() {
-  let log = {
-    x: -150,
-    y: 770,
-    width: random(100, 250),
-    height: 40,
-    speed: 7,
-  };
+  let log = new Logs(-150, 770, random(100, 250), 40, 5);
+
   logs.push(log);
 }
 
+//Function for the mechanics of the snowballs and lifes
 function updateSnowballs() {
   for (let i = snowballs.length - 1; i >= 0; i--) {
     let snowball = snowballs[i];
-    snowball.y += snowball.speed;
+    snowball.update();
+    snowball.draw();
 
-    //Draw the snowballs
-    push();
-    if (snowball.type === "life") {
-      fill(255, 50, 50); // Red color for the heart
-      noStroke();
-      drawHeart(snowball.x, snowball.y, snowball.size / 2); // Use a custom heart shape
-    } else {
-      fill(255, 255, 255);
-      stroke(0, 0, 0);
-      ellipse(snowball.x, snowball.y, snowball.size);
-    }
-    pop();
-
-    //Check for collision with charcater
-    let distance = dist(snowball.x, snowball.y, characterX, height - 100);
-
-    if (distance < snowball.size / 2 + 50) {
-      //If the snowball is "good" increase score
+    // Check for collision with the character
+    //If score snowball collides with character it gives one score
+    //It life collides with character it gives one life, character can max get 5 lives
+    if (snowball.collide(characterX, height - 100)) {
       if (snowball.type === "score") {
         score++;
       } else if (snowball.type === "life") {
-        //Gain one life, you can get max 5 lifes
         lives = min(lives + 1, 5);
       }
+
       //Remove snowball after collision
       snowballs.splice(i, 1);
       continue;
     }
 
-    //Remove the snowballs when they come to the end of the canvas
-    if (snowball.y > height + snowball.size / 2) {
+    //When the snowballs out of canvas, they disappear
+    if (snowball.offCanvas()) {
       snowballs.splice(i, 1);
     }
   }
 }
 
+//Function with log mechanics
 function updateLogs() {
   for (let i = logs.length - 1; i >= 0; i--) {
     let log = logs[i];
-    log.x += log.speed;
+    log.update();
+    log.draw();
 
-    fill(139, 69, 19);
-    rect(log.x, log.y, log.width, log.height, 10);
-
-    if (
-      characterX + 50 > log.x &&
-      characterX - 50 < log.x + log.width &&
-      characterY + 50 > log.y &&
-      characterY - 50 < log.y + log.height
-    ) {
+    //When log collides with character, it takes away one life
+    if (log.collide(characterX, characterY)) {
       lives--;
 
+      //If all lives are lost, the result screen is shown
       if (lives <= 0) {
         state = "result";
       }
+
       logs.splice(i, 1);
       continue;
     }
 
-    if (log.x > width) {
+    //When log is off canvas, they disappear
+    if (log.offCanvas()) {
       logs.splice(i, 1);
     }
   }
@@ -146,13 +209,10 @@ function updateLogs() {
 function resetGame() {
   //Resets the score to 0
   score = 0;
-
   //Resets the lives to 3
   lives = 3;
-
   //Resets the snowballs
   snowballs = [];
-
   //Goes back to the game screen
   state = "game";
 }
@@ -222,6 +282,7 @@ function mousePressed() {
 }
 window.mousePressed = mousePressed;
 
+//Function for when the space is clicked for jumping
 function keyPressed() {
   if (keyCode === 32 && !isJumping) {
     speedY = jumpStrength;
@@ -239,6 +300,7 @@ function drawHeart(x, y, size) {
   endShape();
 }
 
+//Fucntion to draw the character
 function character() {
   // Hat
   fill(100, 100, 100);
@@ -327,6 +389,7 @@ function character() {
   pop();
 }
 
+//Function for when character jumps
 function characterJump() {
   if (characterY < height - 150 || speedY !== 0) {
     speedY += gravity;
@@ -407,7 +470,8 @@ function gameScreen() {
     ellipse(width / 2 + 410 - i * 40, height / 2 - 415, 30);
   }
   pop();
-  //Character movement
+
+  //Character movement depending on what you chose in options screen
   if (controlMode === "arrow") {
     if (keyIsDown(37)) {
       characterX -= 15;
@@ -432,21 +496,17 @@ function gameScreen() {
   characterJump();
 
   updateSnowballs();
+  updateLogs();
 
-  if (frameCount % 100 === 0) {
+  if (frameCount % 150 === 0) {
     createLogs();
   }
 
-  updateLogs();
-
-  if (frameCount % 35 === 0) {
+  if (frameCount % 70 === 0) {
     createSnowball();
   }
 
-  //updateObstacles();
-
   character();
-  //character.draw();
 }
 
 //Function for the result screen
