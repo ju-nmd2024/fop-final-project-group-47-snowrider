@@ -136,7 +136,7 @@ function createSnowball() {
     370,
     random(100, 200),
     4,
-    random() < 0.7 ? "score" : "life"
+    random() < 0.9 ? "score" : "life"
   );
 
   snowballs.push(snowball);
