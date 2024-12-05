@@ -391,6 +391,7 @@ function optionScreen() {
 
 //Function for the game screen
 function gameScreen() {
+  background(133, 206, 244);
   image(gameBgd, 0, 0, width, height);
 
   //Score text
