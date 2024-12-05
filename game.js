@@ -24,7 +24,7 @@ let lives = 3;
 let controlMode = "arrow";
 
 let snowballs = [];
-let obstacles = [];
+let logs = [];
 
 //Character variable
 let characterX = 450;
@@ -51,15 +51,15 @@ function createSnowball() {
   snowballs.push(snowball);
 }
 
-function createObstacles() {
-  let obstacle = {
-    x: random(100, width - 100),
-    y: 370,
-    width: 150,
-    height: 70,
-    speed: 5,
+function createLogs() {
+  let log = {
+    x: 0,
+    y: 770,
+    width: random(100, 250),
+    height: 40,
+    speed: 7,
   };
-  obstacles.push(obstacle);
+  logs.push(log);
 }
 
 function updateSnowballs() {
@@ -103,31 +103,31 @@ function updateSnowballs() {
   }
 }
 
-function updateObstacles() {
-  for (let i = obstacles.length - 1; i >= 0; i--) {
-    let obstacle = obstacles[i];
-    obstacle.y += obstacle.speed;
+function updateLogs() {
+  for (let i = logs.length - 1; i >= 0; i--) {
+    let log = logs[i];
+    log.x += log.speed;
 
     fill(139, 69, 19);
-    rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 10);
+    rect(log.x, log.y, log.width, log.height, 10);
 
     if (
-      characterX + 50 > obstacle.x &&
-      characterX - 50 < obstacle.x + obstacle.width
+      characterX + 50 > log.x &&
+      characterX - 50 < log.x + log.width &&
+      characterY + 50 > log.y &&
+      characterY - 50 < log.y + log.height
     ) {
-      if (characterY + 50 >= obstacle.y) {
-        lives--;
+      lives--;
 
-        if (lives <= 0) {
-          state = "result";
-        }
-        obstacles.splice(i, 1);
-        continue;
+      if (lives <= 0) {
+        state = "result";
       }
+      logs.splice(i, 1);
+      continue;
     }
 
-    if (obstacle.y > height) {
-      obstacles.splice(i, 1);
+    if (log.x > width) {
+      logs.splice(i, 1);
     }
   }
 }
@@ -318,13 +318,6 @@ function character() {
 }
 
 function characterJump() {
-  /*speedY += gravity;
-  characterY += speedY;
-
-  if(characterY >= height - 10) {
-    characterY = height - 100;
-    isJumping = false;
-  }*/
   if (characterY < height - 150 || speedY !== 0) {
     speedY += gravity;
     characterY += speedY;
@@ -433,15 +426,17 @@ function gameScreen() {
 
   updateSnowballs();
 
+  if (frameCount % 100 === 0) {
+    createLogs();
+  }
+
+  updateLogs();
+
   if (frameCount % 35 === 0) {
     createSnowball();
   }
 
-  if (frameCount % 120 === 0) {
-    createObstacles();
-  }
-
-  updateObstacles();
+  //updateObstacles();
 
   character();
   //character.draw();
