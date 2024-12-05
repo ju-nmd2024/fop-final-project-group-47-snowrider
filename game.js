@@ -1,58 +1,14 @@
 let gameStart;
-let End;
+let endGame;
+let option;
 
 //Class imports
 import MountainBackground from "./mountainBackground.js";
-
-//Class for snowball
-class SnowBall {
-  constructor(x, y, size, speed, type) {
-    this.x = x;
-    this.y = y;
-    this.size = size;
-    this.speed = speed;
-    this.type = type;
-  }
-
-  //Drwing the snowballs and the heart
-  draw() {
-    push();
-    if (this.type == "life") {
-      fill(155, 50, 50);
-      noStroke();
-      drawHeart(this.x, this.y, this.size / 2);
-    } else {
-      fill(255, 255, 255);
-      stroke(0, 0, 0);
-      ellipse(this.x, this.y, this.size);
-    }
-    pop();
-  }
-
-  //the movement of the heart and snowball
-  update() {
-    this.y += this.speed;
-  }
-
-  //When the snowball and heart is out of canvas
-  outOfBounds() {
-    return this.y > height + this.size / 2;
-  }
-
-  //Collision with the character
-  collide(characterX, characterY) {
-    //Counting the distance with from the character
-    let distance = dist(this.x, this.y, characterX, characterY);
-
-    return distance < this.size / 2 + 50;
-  }
-}
 
 //Setup function with canvas size
 function setup() {
   createCanvas(900, 900);
 
-  //No stroke for better visuals
   noStroke();
 
   width = 900;
@@ -62,6 +18,8 @@ window.setup = setup;
 
 function preload() {
   gameStart = loadImage("Snow-Rider Start Screen.jpg");
+  endGame = loadImage("Snow-Rider End Screen.jpg");
+  option = loadImage("Snow-Rider Option Screen.jpg");
 }
 
 //Class variables
@@ -69,19 +27,16 @@ const mountainB = new MountainBackground(100, 330);
 
 //State variable
 state = "start";
-
-//Score and life variable
 let score = 0;
 let lives = 3;
 
-//Variable for chosing control mode
+//Control for character variable
 let controlMode = "arrow";
 
-//Snowball and life arrays
 let snowballs = [];
 let logs = [];
 
-//Character variables
+//Character variable
 let characterX = 450;
 let characterY = height - 150;
 let speedY = 0;
@@ -89,61 +44,73 @@ const gravity = 0.6;
 const jumpStrength = -15;
 let isJumping = false;
 
-//Function for snowball/life variables
 function createSnowball() {
-  //Random x position
-  let x = random(50, width - 50);
+  let snowball = {
+    //Random x positioning
+    x: random(50, width - 50),
+    //Y position for the spawning
+    y: 370,
+    //Size of the snowballs
+    size: 150,
+    //Random speeds for the snowballs
+    speed: 7,
 
-  //Fixed y position
-  let y = 370;
-
-  //Random size of the stuff
-  let size = random(50, 100, 150);
-
-  //Fixed speed
-  let speed = 7;
-  //Random types, if its a life or a score snowball
-  let type = random() < 0.7 ? "score" : "life";
-
-  //Pushes the variables into the array
-  snowballs.push(new SnowBall(x, y, size, speed, type));
+    //Random type of snowball
+    type: random() < 0.9 ? "score" : "life",
+  };
+  snowballs.push(snowball);
 }
 
-//Function for the snowballs and life mechanism
-function updateSnowballs() {
-  //Movement
-  for (let i = snowballs.length - 1; i >= 0; i--) {
-    let snowball = snowballs[i];
-    snowball.update();
-    snowball.draw();
-
-    //Collision and out of canvas
-    //If character collides with snowball the score increases with 1
-    //If character collides with life, the life goes up by 1 and you can only get 5 lives max
-    //If the stuff are out of the canvas, they disapear
-    if (snowball.collide(characterX, height - 100)) {
-      if (snowball.type === "score") {
-        score++;
-      } else if (snowball.type === "life") {
-        lives = min(lives + 1, 5);
-      }
-      snowballs.splice(i, 1);
-    } else if (snowball.outOfBounds()) {
-      snowballs.splice(i, 1);
-    }
-  }
-}
-
-//Creation of logs
 function createLogs() {
   let log = {
-    x: -150,
+    x: 0,
     y: 770,
     width: random(100, 250),
     height: 40,
     speed: 7,
   };
   logs.push(log);
+}
+
+function updateSnowballs() {
+  for (let i = snowballs.length - 1; i >= 0; i--) {
+    let snowball = snowballs[i];
+    snowball.y += snowball.speed;
+
+    //Draw the snowballs
+    push();
+    if (snowball.type === "life") {
+      fill(255, 50, 50); // Red color for the heart
+      noStroke();
+      drawHeart(snowball.x, snowball.y, snowball.size / 2); // Use a custom heart shape
+    } else {
+      fill(255, 255, 255);
+      stroke(0, 0, 0);
+      ellipse(snowball.x, snowball.y, snowball.size);
+    }
+    pop();
+
+    //Check for collision with charcater
+    let distance = dist(snowball.x, snowball.y, characterX, height - 100);
+
+    if (distance < snowball.size / 2 + 50) {
+      //If the snowball is "good" increase score
+      if (snowball.type === "score") {
+        score++;
+      } else if (snowball.type === "life") {
+        //Gain one life, you can get max 5 lifes
+        lives = min(lives + 1, 5);
+      }
+      //Remove snowball after collision
+      snowballs.splice(i, 1);
+      continue;
+    }
+
+    //Remove the snowballs when they come to the end of the canvas
+    if (snowball.y > height + snowball.size / 2) {
+      snowballs.splice(i, 1);
+    }
+  }
 }
 
 function updateLogs() {
@@ -375,8 +342,7 @@ function characterJump() {
 
 //Function for the start screen, with buttons
 function startScreen() {
-  background(133, 206, 244);
-  image(gameStart, 0, 0, width, height);
+  image(option, 0, 0, width, height);
 
   //Start and options button
   fill(255, 244, 220);
@@ -388,7 +354,6 @@ function startScreen() {
   fill(0, 0, 0);
   textSize(70);
   textStyle(BOLD);
-  text("SNOW-RIDER", width / 2 - 200, height / 2 - 20);
   textSize(30);
   text("START", width / 2 - 195, height - 200);
   text("OPTIONS", width / 2 + 85, height - 200);
@@ -397,8 +362,7 @@ function startScreen() {
 
 //Fucntion for the options screen with buttons
 function optionScreen() {
-  background(133, 206, 244);
-  mountainB.draw();
+  image(gameStart, 0, 0, width, height);
 
   //Buttons rectangles
   fill(255, 244, 220);
@@ -412,7 +376,7 @@ function optionScreen() {
   fill(0, 0, 0);
   textSize(50);
   textStyle(BOLD);
-  text("Choose between:", width / 2 - 175, height / 2 - 50);
+  text("Choose between:", width / 2 - 175, height / 2 - 40);
 
   //Text in buttons
   textSize(30);
@@ -487,8 +451,7 @@ function gameScreen() {
 
 //Function for the result screen
 function resultScreen() {
-  background(133, 206, 244);
-  mountainB.draw();
+  image(endGame, 0, 0, width, height);
 
   //Rectangles for button for restart and start screen
   fill(255, 244, 220);
