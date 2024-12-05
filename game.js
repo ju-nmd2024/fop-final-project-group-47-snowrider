@@ -1,3 +1,6 @@
+let gameStart;
+let End;
+
 //Class imports
 import MountainBackground from "./mountainBackground.js";
 
@@ -11,6 +14,10 @@ function setup() {
   height = 900;
 }
 window.setup = setup;
+
+function preload() {
+  gameStart = loadImage("Snow-Rider Start Screen.jpg");
+}
 
 //Class variables
 const mountainB = new MountainBackground(100, 330);
@@ -333,7 +340,7 @@ function characterJump() {
 //Function for the start screen, with buttons
 function startScreen() {
   background(133, 206, 244);
-  mountainB.draw();
+  image(gameStart, 0, 0, width, height);
 
   //Start and options button
   fill(255, 244, 220);
