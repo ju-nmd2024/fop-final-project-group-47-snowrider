@@ -5,6 +5,8 @@ import MountainBackground from "./mountainBackground.js";
 let characterY;
 
 //Class for snowball
+//Using return values, taken inspo from Garrits video about return values:
+//https://youtu.be/3KggOvOnxHQ
 class SnowBall {
   constructor(x, y, size, speed, type) {
     this.x = x;
@@ -29,7 +31,7 @@ class SnowBall {
     pop();
   }
 
-  //The movement of the heart and snowball
+  //The continous movement of the heart and snowball
   update() {
     this.y += this.speed;
   }
@@ -49,6 +51,8 @@ class SnowBall {
 }
 
 //Class for the logs
+//Using return values, taken inspo from Garrits video about return values:
+//https://youtu.be/3KggOvOnxHQ
 class Logs {
   constructor(x, y, width, height, speed) {
     this.x = x;
@@ -64,7 +68,7 @@ class Logs {
     rect(this.x, this.y, this.width, this.height, 10);
   }
 
-  //Movement of the logs
+  //Continous movement of the logs
   update() {
     this.x += this.speed;
   }
@@ -130,6 +134,7 @@ function preload() {
 }
 window.preload = preload;
 
+//Function for the Snowball variables and pushing them into the array
 function createSnowball() {
   let snowball = new SnowBall(
     random(50, width - 50),
@@ -142,7 +147,7 @@ function createSnowball() {
   snowballs.push(snowball);
 }
 
-//Function for the log variables
+//Function for the log variables and pushing them into the array
 function createLogs() {
   let log = new Logs(-150, 770, random(100, 250), 40, 5);
 
@@ -205,19 +210,19 @@ function updateLogs() {
   }
 }
 
-//Function for when the game is reseted
+//Function for when the game is reseted so the score starts at 0 again and the lives starts at 3 again
 function resetGame() {
   //Resets the score to 0
   score = 0;
   //Resets the lives to 3
   lives = 3;
-  //Resets the snowballs
-  snowballs = [];
   //Goes back to the game screen
   state = "game";
 }
 
 //Function for when the mouse is pressed
+//Inspired from Garrits video about logical operators
+// https://youtu.be/T1tfXGeie7k
 function mousePressed() {
   //If statement for when the mouse clicks the buttons in the options screen
   //To be able to change controls for the character movement
@@ -283,6 +288,8 @@ function mousePressed() {
 window.mousePressed = mousePressed;
 
 //Function for when the space is clicked for jumping
+//Using key codes as keyboard input, taken from Garrits example video:
+//https://youtu.be/BBXc7XMrxgg
 function keyPressed() {
   if (keyCode === 32 && !isJumping) {
     speedY = jumpStrength;
@@ -464,14 +471,14 @@ function gameScreen() {
   pop();
 
   //Lives displayed on screen
-  push();
   fill(255, 50, 50);
   for (let i = 0; i < lives; i++) {
     ellipse(width / 2 + 410 - i * 40, height / 2 - 415, 30);
   }
-  pop();
 
   //Character movement depending on what you chose in options screen
+  //Using key codes as keyboard input, taken from Garrits example video:
+  //https://youtu.be/BBXc7XMrxgg
   if (controlMode === "arrow") {
     if (keyIsDown(37)) {
       characterX -= 15;
@@ -491,6 +498,7 @@ function gameScreen() {
   }
 
   //Constrains the character from moving outside the canvas
+  //https://p5js.org/reference/p5/constrain/
   characterX = constrain(characterX, 50, width - 50);
 
   characterJump();
@@ -498,10 +506,12 @@ function gameScreen() {
   updateSnowballs();
   updateLogs();
 
+  //Spawns the logs at a low rate so they don't overlap eachother or spawn too fast
   if (frameCount % 150 === 0) {
     createLogs();
   }
 
+  //Spawns the snowballs at a medium pace
   if (frameCount % 70 === 0) {
     createSnowball();
   }
